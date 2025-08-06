@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Health Care Center</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9"
+      crossorigin="anonymous"
+    />
+
+    <style>
+      .offcanvas-small {
+        max-width: 80%;
+        max-height: 50vh;
+        height: auto;
+        overflow-y: auto;
+        /* REMOVE margin-top */
+        /* margin-top: 100px !important; */
+        border-radius: 20px !important;
+        font-size: 1.1rem;
+        text-decoration: none;
+
+        background: rgba(20, 110, 130, 0.15);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+
+        border: 1.5px solid rgba(20, 110, 130, 0.3);
+        box-shadow: 0 8px 24px rgba(20, 110, 130, 0.3),
+          inset 0 0 12px rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease-in-out;
+      }
+
+      .offcanvas-header {
+        background: linear-gradient(135deg, #138086, #45a29e);
+        color: white !important;
+        border-top-left-radius: 20px !important;
+        border-top-right-radius: 20px !important;
+        box-shadow: inset 0 -3px 6px rgba(0, 0, 0, 0.2);
+        font-weight: 600;
+      }
+
+      .btn-close {
+        filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.8));
+        transition: filter 0.3s ease;
+      }
+
+      .btn-close:hover {
+        filter: drop-shadow(0 0 5px rgba(255, 255, 255, 1));
+      }
+
+      .offcanvas-body {
+        background-color: rgba(255, 255, 255, 0.1) !important;
+        color: white !important;
+        padding: 20px 25px;
+        border-bottom-left-radius: 20px !important;
+        border-bottom-right-radius: 20px !important;
+        box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.15);
+        font-weight: 500;
+        font-size: 1.1rem;
+        line-height: 1.5;
+      }
+
+      body {
+        background: url("{{ url_for('static', filename='home.png') }}")
+          no-repeat center center fixed;
+        background-size: cover;
+      }
+
+      .frosted-glass {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.2),
+          rgba(255, 255, 255, 0.05)
+        );
+        backdrop-filter: blur(25px);
+        -webkit-backdrop-filter: blur(25px);
+        border-radius: 25px;
+        border: 1.5px solid rgba(255, 255, 255, 0.4);
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.4),
+          inset 0 0 10px rgba(255, 255, 255, 0.25);
+        padding: 50px 45px;
+        transition: all 0.4s ease-in-out;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .frosted-glass::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(
+          circle at center,
+          rgba(255, 255, 255, 0.3),
+          transparent 70%
+        );
+        animation: pulseGlow 6s ease-in-out infinite;
+        pointer-events: none;
+        z-index: 0;
+        border-radius: 25px;
+      }
+
+      .frosted-glass:hover {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.3),
+          rgba(255, 255, 255, 0.1)
+        );
+        border-color: rgba(255, 255, 255, 0.7);
+        box-shadow: 0 15px 45px 0 rgba(31, 38, 135, 0.6),
+          inset 0 0 15px rgba(255, 255, 255, 0.35);
+        transform: translateY(-4px);
+      }
+
+      @keyframes pulseGlow {
+        0%,
+        100% {
+          transform: scale(1) translate(0, 0);
+          opacity: 0.3;
+        }
+        50% {
+          transform: scale(1.05) translate(10px, 10px);
+          opacity: 0.5;
+        }
+      }
+      /* Add this inside your existing <style> block */
+
+      .btn-predict {
+        background: linear-gradient(135deg, #138086, #45a29e);
+        border: none;
+        color: white !important;
+        font-weight: 700;
+        font-size: 1.25rem;
+        padding: 12px 0;
+        border-radius: 12px;
+        box-shadow: inset 0 -3px 6px rgba(0, 0, 0, 0.2);
+        
+        transition: all 0.3s ease;
+        width: 100%;
+      }
+
+      .btn-predict:hover,
+      .btn-predict:focus {
+        background: linear-gradient(135deg, #138086, #45a29e);
+        box-shadow: inset 0 -3px 6px rgba(0, 0, 0, 0.2);
+        transform: translateY(-3px);
+        outline: none;
+      }
+    </style>
+  </head>
+
+  <body class="bg-dark">
+    <!-- main form of page -->
+    <h1
+      class="my-4 text-center text-white"
+      style="margin-top: 150px !important"
+    >
+      Medicine Recommendations
+    </h1>
+
+    <div class="container my-4 mt-2" style="width: 40%">
+      <div class="frosted-glass">
+        <form action="/predict" method="post">
+          <div class="form-group font-weight-bold">
+            <label
+              for="text_symptoms"
+              style="
+                color: black;
+                font-size: 20px;
+                font-weight: 500;
+                padding: 5px;
+              "
+            >
+              Enter Your Symptoms:
+            </label>
+            <div id="symptoms-container">
+              <input
+                type="text"
+                class="form-control p-3 border border-dark my-2"
+                name="symptoms[]"
+                placeholder="Symptom 1 (e.g., itching)"
+              />
+            </div>
+            <button
+              type="button"
+              class="btn btn-secondary my-2"
+              onclick="addSymptomField()"
+            >
+              Add Another Symptom
+            </button>
+          </div>
+
+          <div name="mysysms" id="transcription"></div>
+
+          {% if message %}
+          <p style="color: red">{{ message }}</p>
+          {% endif %}
+
+          <br />
+          <button
+            type="submit"
+            class="btn btn-predict"
+            style="margin-bottom: 5px"
+          >
+            Predict
+          </button>
+        </form>
+      </div>
+    </div>
+
+    {% if predicted_disease %}
+    <h1 class="text-center my-4 text-white">Our AI System Results</h1>
+    <div class="container">
+      <div class="result-container d-flex flex-wrap justify-content-center">
+        <button
+          class="btn btn-outline-secondary text-white m-2"
+          data-bs-toggle="offcanvas"
+          data-bs-target="#diseaseOffcanvas"
+        >
+          Disease
+        </button>
+        <button
+          class="btn btn-outline-secondary text-white m-2"
+          data-bs-toggle="offcanvas"
+          data-bs-target="#descriptionOffcanvas"
+        >
+          Description
+        </button>
+        <button
+          class="btn btn-outline-secondary text-white m-2"
+          data-bs-toggle="offcanvas"
+          data-bs-target="#precautionOffcanvas"
+        >
+          Precaution
+        </button>
+        <button
+          class="btn btn-outline-secondary text-white m-2"
+          data-bs-toggle="offcanvas"
+          data-bs-target="#medicationsOffcanvas"
+        >
+          Medications
+        </button>
+        <button
+          class="btn btn-outline-secondary text-white m-2"
+          data-bs-toggle="offcanvas"
+          data-bs-target="#workoutsOffcanvas"
+        >
+          Workouts
+        </button>
+        <button
+          class="btn btn-outline-secondary text-white m-2"
+          data-bs-toggle="offcanvas"
+          data-bs-target="#dietsOffcanvas"
+        >
+          Diets
+        </button>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Offcanvas Templates -->
+    <div
+      class="offcanvas offcanvas-end offcanvas-small"
+      tabindex="-1"
+      id="diseaseOffcanvas"
+    >
+      <div
+        class="offcanvas-header"
+        style="background-color: #ffd3b6; color: black"
+      >
+        <h5 class="offcanvas-title fs-3">Predicted Disease</h5>
+        <button
+          type="button"
+          class="btn-close text-reset"
+          data-bs-dismiss="offcanvas"
+        ></button>
+      </div>
+      <div class="offcanvas-body" style="color: black">
+        <p>{{ predicted_disease }}</p>
+      </div>
+    </div>
+
+    <div
+      class="offcanvas offcanvas-end offcanvas-small"
+      tabindex="-1"
+      id="descriptionOffcanvas"
+    >
+      <div
+        class="offcanvas-header"
+        style="background-color: #ffd3b6; color: black"
+      >
+        <h5 class="offcanvas-title fs-3">Description</h5>
+        <button
+          type="button"
+          class="btn-close text-reset"
+          data-bs-dismiss="offcanvas"
+        ></button>
+      </div>
+      <div class="offcanvas-body" style="color: black">
+        <p>{{ dis_des }}</p>
+      </div>
+    </div>
+
+    <div
+      class="offcanvas offcanvas-end offcanvas-small"
+      tabindex="-1"
+      id="precautionOffcanvas"
+    >
+      <div
+        class="offcanvas-header"
+        style="background-color: #ffd3b6; color: black"
+      >
+        <h5 class="offcanvas-title fs-3">Precaution</h5>
+        <button
+          type="button"
+          class="btn-close text-reset"
+          data-bs-dismiss="offcanvas"
+        ></button>
+      </div>
+      <div class="offcanvas-body" style="color: black">
+        <ul>
+          {% for i in my_precautions %}
+          <li>{{ i }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+
+    <div
+      class="offcanvas offcanvas-end offcanvas-small"
+      tabindex="-1"
+      id="medicationsOffcanvas"
+    >
+      <div
+        class="offcanvas-header"
+        style="background-color: #ffd3b6; color: black"
+      >
+        <h5 class="offcanvas-title fs-3">Medications</h5>
+        <button
+          type="button"
+          class="btn-close text-reset"
+          data-bs-dismiss="offcanvas"
+        ></button>
+      </div>
+      <div class="offcanvas-body" style="color: black">
+        <ul>
+          {% for i in medications %}
+          <li>{{ i }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+
+    <div
+      class="offcanvas offcanvas-end offcanvas-small"
+      tabindex="-1"
+      id="workoutsOffcanvas"
+    >
+      <div
+        class="offcanvas-header"
+        style="background-color: #ffd3b6; color: black"
+      >
+        <h5 class="offcanvas-title fs-3">Workouts</h5>
+        <button
+          type="button"
+          class="btn-close text-reset"
+          data-bs-dismiss="offcanvas"
+        ></button>
+      </div>
+      <div class="offcanvas-body" style="color: black">
+        <ul>
+          {% for i in workout %}
+          <li>{{ i }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+
+    <div
+      class="offcanvas offcanvas-end offcanvas-small"
+      tabindex="-1"
+      id="dietsOffcanvas"
+    >
+      <div
+        class="offcanvas-header"
+        style="background-color: #ffd3b6; color: black"
+      >
+        <h5 class="offcanvas-title fs-3">Diets</h5>
+        <button
+          type="button"
+          class="btn-close text-reset"
+          data-bs-dismiss="offcanvas"
+        ></button>
+      </div>
+      <div class="offcanvas-body" style="color: black">
+        <ul>
+          {% for i in my_diet %}
+          <li>{{ i }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      function addSymptomField() {
+        const container = document.getElementById("symptoms-container");
+        const symptomCount = container.getElementsByTagName("input").length + 1;
+
+        const input = document.createElement("input");
+        input.type = "text";
+        input.name = "symptoms[]";
+        input.className = "form-control p-3 border border-dark my-2";
+        input.placeholder = `Symptom ${symptomCount} (e.g., sneezing)`;
+
+        container.appendChild(input);
+      }
+    </script>
+  </body>
+</html>

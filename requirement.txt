@@ -1,0 +1,14 @@
+# Web framework for routing, form handling, and rendering HTML templates
+Flask==2.2.5
+
+# For numerical operations and handling input vectors for the ML model
+numpy==1.24.4
+
+# For reading and processing CSV files (symptoms, medications, etc.)
+pandas==1.5.3
+
+# For loading the trained SVM model and making predictions
+scikit-learn==1.2.2
+
+# Optional: For loading models if saved using joblib instead of pickle
+joblib==1.2.0
